@@ -1,76 +1,172 @@
+const features = [
+  {
+    title: "Job Analyzer",
+    description:
+      "Compare your resume against a job description and get an AI-powered match score.",
+    icon: "🎯",
+  },
+  {
+    title: "Resume Review",
+    description:
+      "Upload your resume and receive personalized recommendations to improve it.",
+    icon: "📄",
+  },
+  {
+    title: "Interview Prep",
+    description:
+      "Practice realistic interview questions and get AI-powered feedback.",
+    icon: "🎤",
+  },
+];
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      <nav className="flex items-center justify-between px-8 py-6">
-        <h1 className="text-2xl font-bold">
-          AI JobPilot
-        </h1>
+      <div className="flex min-h-screen">
+        <aside className="hidden w-64 border-r border-slate-800 bg-slate-900 p-6 md:block">
+          <h1 className="mb-10 text-2xl font-bold text-blue-400">
+            AI JobPilot
+          </h1>
 
-        <button className="rounded-lg bg-white px-5 py-2 font-medium text-slate-950">
-          Get Started
-        </button>
-      </nav>
+          <nav className="space-y-2">
+            <a
+              href="#"
+              className="block rounded-lg bg-blue-500 px-4 py-3 font-medium"
+            >
+              🏠 Dashboard
+            </a>
 
-      <section className="mx-auto max-w-5xl px-8 py-24 text-center">
-        <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-blue-400">
-          AI-Powered Career Assistant
-        </p>
+            <a
+              href="#"
+              className="block rounded-lg px-4 py-3 text-slate-300 hover:bg-slate-800"
+            >
+              📄 Resume
+            </a>
 
-        <h2 className="text-5xl font-bold tracking-tight md:text-6xl">
-          Turn Your Resume Into Your
-          <span className="text-blue-400"> Competitive Edge.</span>
-        </h2>
+            <a
+              href="#"
+              className="block rounded-lg px-4 py-3 text-slate-300 hover:bg-slate-800"
+            >
+              🎯 Job Analyzer
+            </a>
 
-        <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-400">
-          Analyze job descriptions, discover missing skills,
-          improve your resume, and prepare for interviews with AI.
-        </p>
+            <a
+              href="#"
+              className="block rounded-lg px-4 py-3 text-slate-300 hover:bg-slate-800"
+            >
+              🎤 Interview Prep
+            </a>
 
-        <div className="mt-10 flex justify-center gap-4">
-          <button className="rounded-lg bg-blue-500 px-6 py-3 font-semibold hover:bg-blue-600">
-            Analyze a Job
-          </button>
+            <a
+              href="#"
+              className="block rounded-lg px-4 py-3 text-slate-300 hover:bg-slate-800"
+            >
+              💼 Applications
+            </a>
 
-          <button className="rounded-lg border border-slate-700 px-6 py-3 font-semibold hover:bg-slate-900">
-            Upload Resume
-          </button>
-        </div>
-      </section>
+            <a
+              href="#"
+              className="block rounded-lg px-4 py-3 text-slate-300 hover:bg-slate-800"
+            >
+              🤖 AI Assistant
+            </a>
+          </nav>
+        </aside>
 
-      <section className="mx-auto grid max-w-5xl gap-6 px-8 pb-20 md:grid-cols-3">
-        <div className="rounded-xl border border-slate-800 bg-slate-900 p-6">
-          <h3 className="text-xl font-semibold">
-            🎯 Job Matching
-          </h3>
+        <section className="flex-1">
+          <header className="flex items-center justify-between border-b border-slate-800 px-8 py-6">
+            <div>
+              <p className="text-sm text-slate-400">Welcome to</p>
+              <h2 className="text-2xl font-bold">Your Career Dashboard</h2>
+            </div>
 
-          <p className="mt-3 text-slate-400">
-            Compare your skills against a job description
-            and receive an AI-powered match score.
-          </p>
-        </div>
+            <button className="rounded-lg bg-blue-500 px-5 py-2 font-semibold hover:bg-blue-600">
+              Analyze a Job
+            </button>
+          </header>
 
-        <div className="rounded-xl border border-slate-800 bg-slate-900 p-6">
-          <h3 className="text-xl font-semibold">
-            📄 Resume Analysis
-          </h3>
+          <div className="p-8">
+            <section className="rounded-2xl border border-slate-800 bg-gradient-to-r from-slate-900 to-slate-950 p-8">
+              <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-blue-400">
+                AI-Powered Career Assistant
+              </p>
 
-          <p className="mt-3 text-slate-400">
-            Upload your resume and get personalized
-            recommendations for improvement.
-          </p>
-        </div>
+              <h3 className="max-w-3xl text-4xl font-bold">
+                Turn your experience into a stronger software engineering
+                application.
+              </h3>
 
-        <div className="rounded-xl border border-slate-800 bg-slate-900 p-6">
-          <h3 className="text-xl font-semibold">
-            🎤 Interview Prep
-          </h3>
+              <p className="mt-4 max-w-2xl text-slate-400">
+                Analyze jobs, improve your resume, prepare for interviews, and
+                track your applications from one place.
+              </p>
 
-          <p className="mt-3 text-slate-400">
-            Practice realistic interview questions and
-            receive AI-powered feedback.
-          </p>
-        </div>
-      </section>
+              <div className="mt-7 flex flex-wrap gap-4">
+                <button className="rounded-lg bg-blue-500 px-6 py-3 font-semibold hover:bg-blue-600">
+                  Start Job Analysis
+                </button>
+
+                <button className="rounded-lg border border-slate-700 px-6 py-3 font-semibold hover:bg-slate-800">
+                  Upload Resume
+                </button>
+              </div>
+            </section>
+
+            <section className="mt-8 grid gap-6 md:grid-cols-3">
+              <div className="rounded-xl border border-slate-800 bg-slate-900 p-6">
+                <p className="text-sm text-slate-400">Applications</p>
+                <p className="mt-2 text-3xl font-bold">0</p>
+                <p className="mt-2 text-sm text-slate-500">
+                  Start tracking your job search
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-slate-800 bg-slate-900 p-6">
+                <p className="text-sm text-slate-400">Average Match</p>
+                <p className="mt-2 text-3xl font-bold">--</p>
+                <p className="mt-2 text-sm text-slate-500">
+                  Analyze your first job
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-slate-800 bg-slate-900 p-6">
+                <p className="text-sm text-slate-400">Interview Sessions</p>
+                <p className="mt-2 text-3xl font-bold">0</p>
+                <p className="mt-2 text-sm text-slate-500">
+                  Practice with AI feedback
+                </p>
+              </div>
+            </section>
+
+            <section className="mt-8">
+              <h3 className="mb-5 text-xl font-bold">Tools</h3>
+
+              <div className="grid gap-6 md:grid-cols-3">
+                {features.map((feature) => (
+                  <div
+                    key={feature.title}
+                    className="rounded-xl border border-slate-800 bg-slate-900 p-6 transition hover:-translate-y-1 hover:border-blue-500"
+                  >
+                    <div className="text-3xl">{feature.icon}</div>
+
+                    <h4 className="mt-4 text-xl font-semibold">
+                      {feature.title}
+                    </h4>
+
+                    <p className="mt-3 text-sm leading-6 text-slate-400">
+                      {feature.description}
+                    </p>
+
+                    <button className="mt-5 font-semibold text-blue-400 hover:text-blue-300">
+                      Open tool →
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
