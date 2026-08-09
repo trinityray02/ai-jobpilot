@@ -1,21 +1,26 @@
+import Link from "next/link";
+
 const features = [
   {
     title: "Job Analyzer",
     description:
       "Compare your resume against a job description and get an AI-powered match score.",
     icon: "🎯",
+    href: "/job-analyzer",
   },
   {
     title: "Resume Review",
     description:
-      "Upload your resume and receive personalized recommendations to improve it.",
+      "Upload your resume and let AI JobPilot read and prepare it for analysis.",
     icon: "📄",
+    href: "/resume",
   },
   {
     title: "Interview Prep",
     description:
-      "Practice realistic interview questions and get AI-powered feedback.",
+      "Practice realistic interview questions and receive AI-powered feedback.",
     icon: "🎤",
+    href: "/interview-prep",
   },
 ];
 
@@ -29,47 +34,40 @@ export default function Home() {
           </h1>
 
           <nav className="space-y-2">
-            <a
-              href="#"
+            <Link
+              href="/"
               className="block rounded-lg bg-blue-500 px-4 py-3 font-medium"
             >
               🏠 Dashboard
-            </a>
+            </Link>
 
-            <a
-              href="#"
+            <Link
+              href="/resume"
               className="block rounded-lg px-4 py-3 text-slate-300 hover:bg-slate-800"
             >
               📄 Resume
-            </a>
+            </Link>
 
-            <a
-              href="#"
+            <Link
+              href="/job-analyzer"
               className="block rounded-lg px-4 py-3 text-slate-300 hover:bg-slate-800"
             >
               🎯 Job Analyzer
-            </a>
+            </Link>
 
-            <a
-              href="#"
+            <Link
+              href="/interview-prep"
               className="block rounded-lg px-4 py-3 text-slate-300 hover:bg-slate-800"
             >
               🎤 Interview Prep
-            </a>
+            </Link>
 
-            <a
-              href="#"
+            <Link
+              href="/applications"
               className="block rounded-lg px-4 py-3 text-slate-300 hover:bg-slate-800"
             >
               💼 Applications
-            </a>
-
-            <a
-              href="#"
-              className="block rounded-lg px-4 py-3 text-slate-300 hover:bg-slate-800"
-            >
-              🤖 AI Assistant
-            </a>
+            </Link>
           </nav>
         </aside>
 
@@ -80,9 +78,12 @@ export default function Home() {
               <h2 className="text-2xl font-bold">Your Career Dashboard</h2>
             </div>
 
-            <button className="rounded-lg bg-blue-500 px-5 py-2 font-semibold hover:bg-blue-600">
+            <Link
+              href="/job-analyzer"
+              className="rounded-lg bg-blue-500 px-5 py-2 font-semibold hover:bg-blue-600"
+            >
               Analyze a Job
-            </button>
+            </Link>
           </header>
 
           <div className="p-8">
@@ -97,18 +98,24 @@ export default function Home() {
               </h3>
 
               <p className="mt-4 max-w-2xl text-slate-400">
-                Analyze jobs, improve your resume, prepare for interviews, and
-                track your applications from one place.
+                Upload your resume, analyze jobs, identify skill gaps, and
+                prepare for interviews from one place.
               </p>
 
               <div className="mt-7 flex flex-wrap gap-4">
-                <button className="rounded-lg bg-blue-500 px-6 py-3 font-semibold hover:bg-blue-600">
+                <Link
+                  href="/job-analyzer"
+                  className="rounded-lg bg-blue-500 px-6 py-3 font-semibold hover:bg-blue-600"
+                >
                   Start Job Analysis
-                </button>
+                </Link>
 
-                <button className="rounded-lg border border-slate-700 px-6 py-3 font-semibold hover:bg-slate-800">
+                <Link
+                  href="/resume"
+                  className="rounded-lg border border-slate-700 px-6 py-3 font-semibold hover:bg-slate-800"
+                >
                   Upload Resume
-                </button>
+                </Link>
               </div>
             </section>
 
@@ -117,23 +124,23 @@ export default function Home() {
                 <p className="text-sm text-slate-400">Applications</p>
                 <p className="mt-2 text-3xl font-bold">0</p>
                 <p className="mt-2 text-sm text-slate-500">
-                  Start tracking your job search
+                  Application tracking coming next
                 </p>
               </div>
 
               <div className="rounded-xl border border-slate-800 bg-slate-900 p-6">
-                <p className="text-sm text-slate-400">Average Match</p>
-                <p className="mt-2 text-3xl font-bold">--</p>
+                <p className="text-sm text-slate-400">AI Analysis</p>
+                <p className="mt-2 text-3xl font-bold">Live</p>
                 <p className="mt-2 text-sm text-slate-500">
-                  Analyze your first job
+                  Personalized resume matching is active
                 </p>
               </div>
 
               <div className="rounded-xl border border-slate-800 bg-slate-900 p-6">
-                <p className="text-sm text-slate-400">Interview Sessions</p>
-                <p className="mt-2 text-3xl font-bold">0</p>
+                <p className="text-sm text-slate-400">Resume Processing</p>
+                <p className="mt-2 text-3xl font-bold">PDF</p>
                 <p className="mt-2 text-sm text-slate-500">
-                  Practice with AI feedback
+                  Resume text extraction supported
                 </p>
               </div>
             </section>
@@ -143,8 +150,9 @@ export default function Home() {
 
               <div className="grid gap-6 md:grid-cols-3">
                 {features.map((feature) => (
-                  <div
+                  <Link
                     key={feature.title}
+                    href={feature.href}
                     className="rounded-xl border border-slate-800 bg-slate-900 p-6 transition hover:-translate-y-1 hover:border-blue-500"
                   >
                     <div className="text-3xl">{feature.icon}</div>
@@ -157,10 +165,10 @@ export default function Home() {
                       {feature.description}
                     </p>
 
-                    <button className="mt-5 font-semibold text-blue-400 hover:text-blue-300">
+                    <p className="mt-5 font-semibold text-blue-400">
                       Open tool →
-                    </button>
-                  </div>
+                    </p>
+                  </Link>
                 ))}
               </div>
             </section>
