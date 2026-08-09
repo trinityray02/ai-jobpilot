@@ -6,11 +6,13 @@ export default function ResumePage() {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [resumeText, setResumeText] = useState("");
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const selectedFile = event.target.files?.[0];
 
     setMessage("");
+    setResumeText("");
 
     if (!selectedFile) {
       setFile(null);
@@ -35,6 +37,7 @@ export default function ResumePage() {
     try {
       setUploading(true);
       setMessage("");
+      setResumeText("");
 
       const formData = new FormData();
 
@@ -48,7 +51,7 @@ export default function ResumePage() {
       const text = await response.text();
 
       let data;
-      
+
       try {
         data = JSON.parse(text);
       } catch {
@@ -62,8 +65,10 @@ export default function ResumePage() {
         return;
       }
 
+      setResumeText(data.resumeText);
+
       setMessage(
-        `Resume uploaded successfully: ${data.fileName}`
+        `Resume processed successfully: ${data.fileName}`
       );
     } catch (error) {
       console.error(error);
@@ -161,12 +166,30 @@ export default function ResumePage() {
             disabled={!file || uploading}
             className="mt-6 w-full rounded-lg bg-blue-500 px-6 py-3 font-semibold hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {uploading ? "Uploading..." : "Upload Resume"}
+            {uploading ? "Processing Resume..." : "Upload Resume"}
           </button>
 
           {message && (
             <div className="mt-5 rounded-lg border border-slate-800 bg-slate-950 p-4 text-sm text-slate-300">
               {message}
+            </div>
+          )}
+
+          {resumeText && (
+            <div className="mt-6 rounded-xl border border-slate-800 bg-slate-950 p-6">
+
+              <h2 className="text-lg font-semibold">
+                Extracted Resume Text
+              </h2>
+
+              <p className="mt-2 text-sm text-slate-400">
+                AI JobPilot successfully read your resume.
+              </p>
+
+              <div className="mt-4 max-h-80 overflow-y-auto whitespace-pre-wrap rounded-lg border border-slate-800 bg-slate-900 p-4 text-sm leading-6 text-slate-300">
+                {resumeText}
+              </div>
+
             </div>
           )}
 
