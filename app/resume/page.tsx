@@ -67,9 +67,12 @@ export default function ResumePage() {
 
       setResumeText(data.resumeText);
 
-      setMessage(
-        `Resume processed successfully: ${data.fileName}`
-      );
+localStorage.setItem("resumeText", data.resumeText);
+localStorage.setItem("resumeFileName", data.fileName);
+
+setMessage(
+  `Resume processed successfully: ${data.fileName}`
+);
     } catch (error) {
       console.error(error);
       setMessage("Unable to upload resume.");

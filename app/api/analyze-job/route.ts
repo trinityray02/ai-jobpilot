@@ -8,11 +8,19 @@ const groq = new Groq({
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { jobDescription } = body;
+
+    const { jobDescription, resumeText } = body;
 
     if (!jobDescription || !jobDescription.trim()) {
       return NextResponse.json(
         { error: "Job description is required." },
+        { status: 400 }
+      );
+    }
+
+    if (!resumeText || !resumeText.trim()) {
+      return NextResponse.json(
+        { error: "Resume text is required." },
         { status: 400 }
       );
     }
@@ -24,20 +32,16 @@ export async function POST(request: Request) {
         {
           role: "system",
           content: `
-You are an AI career assistant.
+You are an AI resume and job matching assistant.
 
-Your job is to analyze job descriptions and return structured JSON.
+Compare the candidate's resume against the job description.
 
-The candidate currently has experience with:
-- TypeScript
-- React
-- Node.js
-- Git
-- REST APIs
-- Python
-- PostgreSQL
+Only count a skill as detected when there is reasonable evidence of it
+in the resume.
 
-Return ONLY valid JSON using this exact structure:
+Do not assume the candidate has skills that are not present in the resume.
+
+Return ONLY valid JSON in exactly this structure:
 
 {
   "matchScore": 0,
@@ -48,28 +52,46 @@ Return ONLY valid JSON using this exact structure:
 
 Rules:
 
-- matchScore must be a number between 0 and 100.
-- detectedSkills must contain relevant skills the candidate has.
-- missingSkills must contain important skills required by the job that the candidate does not have.
-- recommendations must contain exactly 3 useful recommendations.
-- Do not return markdown.
-- Do not use backticks.
-- Do not include explanations outside the JSON.
+- matchScore must be an integer from 0 to 100.
+- Base the score on relevant skills, experience, tools, technologies,
+  education, and qualifications.
+- detectedSkills should contain important job requirements that are
+  supported by the resume.
+- missingSkills should contain important job requirements that are not
+  clearly supported by the resume.
+- recommendations must contain exactly 3 specific ways the candidate
+  could strengthen their application.
+- Do not invent candidate experience.
+- Do not include markdown.
+- Do not include backticks.
+- Do not include text outside the JSON.
           `,
         },
         {
           role: "user",
-          content: jobDescription,
+          content: `
+CANDIDATE RESUME:
+
+${resumeText}
+
+----------------------------
+
+JOB DESCRIPTION:
+
+${jobDescription}
+          `,
         },
       ],
 
-      temperature: 0.2,
+      temperature: 0.1,
+
       response_format: {
         type: "json_object",
       },
     });
 
-    const text = completion.choices[0]?.message?.content;
+    const text =
+      completion.choices[0]?.message?.content;
 
     if (!text) {
       throw new Error("AI returned an empty response.");
@@ -86,7 +108,8 @@ Rules:
 
     return NextResponse.json(
       {
-        error: "AI analysis failed. Please try again.",
+        error:
+          "AI analysis failed. Please try again.",
       },
       { status: 500 }
     );
