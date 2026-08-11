@@ -8,6 +8,8 @@ type Application = {
   role: string;
   status: "Applied" | "Interview" | "Offer" | "Rejected";
   date: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export default function ApplicationsPage() {
@@ -16,61 +18,153 @@ export default function ApplicationsPage() {
   const [role, setRole] = useState("");
   const [status, setStatus] = useState<Application["status"]>("Applied");
   const [date, setDate] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const saved = localStorage.getItem("applications");
-
-    if (saved) {
-      setApplications(JSON.parse(saved));
-    }
+    loadApplications();
   }, []);
 
-  function saveApplications(updated: Application[]) {
-    setApplications(updated);
-    localStorage.setItem("applications", JSON.stringify(updated));
+  async function loadApplications() {
+    try {
+      setLoading(true);
+      setError("");
+
+      const response = await fetch("/api/applications");
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Unable to load applications.");
+        return;
+      }
+
+      setApplications(data.applications);
+    } catch (error) {
+      console.error(error);
+      setError("Unable to connect to the server.");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function addApplication() {
+  async function addApplication() {
     if (!company.trim() || !role.trim()) {
-      alert("Please enter a company and role.");
+      setError("Please enter a company and role.");
       return;
     }
 
-    const newApplication: Application = {
-      id: crypto.randomUUID(),
-      company,
-      role,
-      status,
-      date: date || new Date().toISOString().split("T")[0],
-    };
+    try {
+      setSaving(true);
+      setError("");
 
-    saveApplications([newApplication, ...applications]);
+      const response = await fetch("/api/applications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          company,
+          role,
+          status,
+          date,
+        }),
+      });
 
-    setCompany("");
-    setRole("");
-    setStatus("Applied");
-    setDate("");
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Unable to add application.");
+        return;
+      }
+
+      setApplications((current) => [
+        data.application,
+        ...current,
+      ]);
+
+      setCompany("");
+      setRole("");
+      setStatus("Applied");
+      setDate("");
+    } catch (error) {
+      console.error(error);
+      setError("Unable to connect to the server.");
+    } finally {
+      setSaving(false);
+    }
   }
 
-  function updateStatus(
+  async function updateStatus(
     id: string,
     newStatus: Application["status"]
   ) {
-    const updated = applications.map((application) =>
-      application.id === id
-        ? { ...application, status: newStatus }
-        : application
-    );
+    try {
+      setError("");
 
-    saveApplications(updated);
+      const response = await fetch(`/api/applications/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: newStatus,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Unable to update application.");
+        return;
+      }
+
+      setApplications((current) =>
+        current.map((application) =>
+          application.id === id
+            ? data.application
+            : application
+        )
+      );
+    } catch (error) {
+      console.error(error);
+      setError("Unable to connect to the server.");
+    }
   }
 
-  function deleteApplication(id: string) {
-    const updated = applications.filter(
-      (application) => application.id !== id
+  async function deleteApplication(id: string) {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this application?"
     );
 
-    saveApplications(updated);
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setError("");
+
+      const response = await fetch(`/api/applications/${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Unable to delete application.");
+        return;
+      }
+
+      setApplications((current) =>
+        current.filter(
+          (application) => application.id !== id
+        )
+      );
+    } catch (error) {
+      console.error(error);
+      setError("Unable to connect to the server.");
+    }
   }
 
   return (
@@ -93,8 +187,8 @@ export default function ApplicationsPage() {
           </h1>
 
           <p className="mt-3 max-w-2xl text-slate-400">
-            Track the roles you apply to and update their status as you move
-            through the hiring process.
+            Track applications in your PostgreSQL database and update
+            your progress throughout the hiring process.
           </p>
         </div>
 
@@ -121,14 +215,16 @@ export default function ApplicationsPage() {
             <select
               value={status}
               onChange={(event) =>
-                setStatus(event.target.value as Application["status"])
+                setStatus(
+                  event.target.value as Application["status"]
+                )
               }
               className="rounded-xl border border-slate-700 bg-slate-950 p-4 outline-none focus:border-blue-500"
             >
-              <option>Applied</option>
-              <option>Interview</option>
-              <option>Offer</option>
-              <option>Rejected</option>
+              <option value="Applied">Applied</option>
+              <option value="Interview">Interview</option>
+              <option value="Offer">Offer</option>
+              <option value="Rejected">Rejected</option>
             </select>
 
             <input
@@ -141,107 +237,152 @@ export default function ApplicationsPage() {
 
           <button
             onClick={addApplication}
-            className="mt-5 w-full rounded-lg bg-blue-500 px-6 py-3 font-semibold hover:bg-blue-600"
+            disabled={saving}
+            className="mt-5 w-full rounded-lg bg-blue-500 px-6 py-3 font-semibold hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Add Application
+            {saving ? "Saving..." : "Add Application"}
           </button>
+
+          {error && (
+            <div className="mt-5 rounded-lg border border-red-900 bg-red-950/30 p-4 text-sm text-red-300">
+              {error}
+            </div>
+          )}
         </div>
 
         <div className="mt-8 grid gap-4 md:grid-cols-4">
           <div className="rounded-xl border border-slate-800 bg-slate-900 p-5">
-            <p className="text-sm text-slate-400">Total</p>
+            <p className="text-sm text-slate-400">
+              Total
+            </p>
+
             <p className="mt-2 text-3xl font-bold">
               {applications.length}
             </p>
           </div>
 
           <div className="rounded-xl border border-slate-800 bg-slate-900 p-5">
-            <p className="text-sm text-slate-400">Applied</p>
+            <p className="text-sm text-slate-400">
+              Applied
+            </p>
+
             <p className="mt-2 text-3xl font-bold">
               {
                 applications.filter(
-                  (application) => application.status === "Applied"
+                  (application) =>
+                    application.status === "Applied"
                 ).length
               }
             </p>
           </div>
 
           <div className="rounded-xl border border-slate-800 bg-slate-900 p-5">
-            <p className="text-sm text-slate-400">Interviews</p>
+            <p className="text-sm text-slate-400">
+              Interviews
+            </p>
+
             <p className="mt-2 text-3xl font-bold">
               {
                 applications.filter(
-                  (application) => application.status === "Interview"
+                  (application) =>
+                    application.status === "Interview"
                 ).length
               }
             </p>
           </div>
 
           <div className="rounded-xl border border-slate-800 bg-slate-900 p-5">
-            <p className="text-sm text-slate-400">Offers</p>
+            <p className="text-sm text-slate-400">
+              Offers
+            </p>
+
             <p className="mt-2 text-3xl font-bold">
               {
                 applications.filter(
-                  (application) => application.status === "Offer"
+                  (application) =>
+                    application.status === "Offer"
                 ).length
               }
             </p>
           </div>
         </div>
 
-        <div className="mt-8 space-y-4">
-          {applications.length === 0 ? (
+        <div className="mt-8">
+          {loading ? (
             <div className="rounded-xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-400">
-              No applications yet.
+              Loading applications...
+            </div>
+          ) : applications.length === 0 ? (
+            <div className="rounded-xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-400">
+              No applications yet. Add your first one above.
             </div>
           ) : (
-            applications.map((application) => (
-              <div
-                key={application.id}
-                className="rounded-xl border border-slate-800 bg-slate-900 p-6"
-              >
-                <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <h3 className="text-xl font-semibold">
-                      {application.role}
-                    </h3>
+            <div className="space-y-4">
+              {applications.map((application) => (
+                <div
+                  key={application.id}
+                  className="rounded-xl border border-slate-800 bg-slate-900 p-6"
+                >
+                  <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <h3 className="text-xl font-semibold">
+                        {application.role}
+                      </h3>
 
-                    <p className="mt-1 text-slate-400">
-                      {application.company}
-                    </p>
+                      <p className="mt-1 text-slate-400">
+                        {application.company}
+                      </p>
 
-                    <p className="mt-2 text-sm text-slate-500">
-                      Added: {application.date}
-                    </p>
-                  </div>
+                      <p className="mt-2 text-sm text-slate-500">
+                        Application date:{" "}
+                        {new Date(
+                          application.date
+                        ).toLocaleDateString()}
+                      </p>
+                    </div>
 
-                  <div className="flex flex-wrap items-center gap-3">
-                    <select
-                      value={application.status}
-                      onChange={(event) =>
-                        updateStatus(
-                          application.id,
-                          event.target.value as Application["status"]
-                        )
-                      }
-                      className="rounded-lg border border-slate-700 bg-slate-950 px-4 py-2 outline-none"
-                    >
-                      <option>Applied</option>
-                      <option>Interview</option>
-                      <option>Offer</option>
-                      <option>Rejected</option>
-                    </select>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <select
+                        value={application.status}
+                        onChange={(event) =>
+                          updateStatus(
+                            application.id,
+                            event.target
+                              .value as Application["status"]
+                          )
+                        }
+                        className="rounded-lg border border-slate-700 bg-slate-950 px-4 py-2 outline-none focus:border-blue-500"
+                      >
+                        <option value="Applied">
+                          Applied
+                        </option>
 
-                    <button
-                      onClick={() => deleteApplication(application.id)}
-                      className="rounded-lg border border-red-900 px-4 py-2 text-red-400 hover:bg-red-950/30"
-                    >
-                      Delete
-                    </button>
+                        <option value="Interview">
+                          Interview
+                        </option>
+
+                        <option value="Offer">
+                          Offer
+                        </option>
+
+                        <option value="Rejected">
+                          Rejected
+                        </option>
+                      </select>
+
+                      <button
+                        onClick={() =>
+                          deleteApplication(application.id)
+                        }
+                        className="rounded-lg border border-red-900 px-4 py-2 text-red-400 hover:bg-red-950/30"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
       </div>
